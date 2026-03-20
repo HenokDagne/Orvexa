@@ -1,0 +1,16 @@
+{
+  "name": "products-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Express backend that proxies products from DummyJSON",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
