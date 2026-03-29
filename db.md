@@ -1,11 +1,3 @@
-generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
 
 enum UserStatus {
   active
@@ -47,7 +39,6 @@ enum ShipmentStatus {
   delivered
 }
 
-
 model users {
   id             String     @id @default(uuid()) @db.Uuid
   email          String     @unique
@@ -55,20 +46,20 @@ model users {
   name           String?
   phone          String?
   status         UserStatus @default(active)
-  is_email_verified Boolean @default(false)
-  is_phone_verified Boolean @default(false)
-  phone_verification_code String?
-  phone_verification_expires DateTime?
+  seller_enabled Boolean    @default(false)
+  store_name     String?
+  store_slug     String?    @unique
+  store_bio      String?
+  store_logo_url String?
   created_at     DateTime   @default(now())
   updated_at     DateTime   @updatedAt
+
   user_roles       user_roles[]
+  products         products[]
   carts            carts[]
   buyer_orders     orders[]     @relation("buyer_orders")
   seller_suborders sub_orders[] @relation("seller_suborders")
   reviews          reviews[]
-  username String?  @unique
-
-  
 }
 
 model user_roles {
@@ -96,21 +87,22 @@ model categories {
 
 model products {
   id          String        @id @default(uuid()) @db.Uuid
+  seller_id   String        @db.Uuid
   category_id String        @db.Uuid
   title       String
   description String?
   status      ProductStatus @default(draft)
   created_at  DateTime      @default(now())
   updated_at  DateTime      @updatedAt
-  price       Int
-  rate        Int
 
+  seller      users              @relation(fields: [seller_id], references: [id], onDelete: Restrict)
   category    categories         @relation(fields: [category_id], references: [id], onDelete: Restrict)
   images      product_images[]
-  cart_items  cart_items[]
+  variants    product_variants[]
   reviews     reviews[]
   order_items sub_order_items[]
 
+  @@index([seller_id])
   @@index([category_id])
 }
 
@@ -122,6 +114,25 @@ model product_images {
   sort_order Int     @default(0)
 
   product products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@index([product_id])
+}
+
+model product_variants {
+  id                     String   @id @default(uuid()) @db.Uuid
+  product_id             String   @db.Uuid
+  sku                    String   @unique
+  color                  String?
+  size                   String?
+  price_cents            Int
+  compare_at_price_cents Int?
+  stock_on_hand          Int
+  created_at             DateTime @default(now())
+  updated_at             DateTime @updatedAt
+
+  product         products          @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  cart_items      cart_items[]
+  sub_order_items sub_order_items[]
 
   @@index([product_id])
 }
@@ -139,14 +150,14 @@ model carts {
 model cart_items {
   id         String @id @default(uuid()) @db.Uuid
   cart_id    String @db.Uuid
-  product_id String @db.Uuid
+  variant_id String @db.Uuid
   qty        Int
 
-  cart    carts    @relation(fields: [cart_id], references: [id], onDelete: Cascade)
-  product products @relation(fields: [product_id], references: [id], onDelete: Restrict)
+  cart    carts            @relation(fields: [cart_id], references: [id], onDelete: Cascade)
+  variant product_variants @relation(fields: [variant_id], references: [id], onDelete: Restrict)
 
-  @@unique([cart_id, product_id])
-  @@index([product_id])
+  @@unique([cart_id, variant_id])
+  @@index([variant_id])
 }
 
 model orders {
@@ -202,7 +213,7 @@ model sub_orders {
 model sub_order_items {
   id                  String  @id @default(uuid()) @db.Uuid
   sub_order_id        String  @db.Uuid
-  product_id          String  @db.Uuid
+  variant_id          String  @db.Uuid
   qty                 Int
   unit_price_cents    Int
   product_title       String
@@ -212,11 +223,13 @@ model sub_order_items {
   variant_color       String?
   variant_size        String?
 
-  sub_order sub_orders @relation(fields: [sub_order_id], references: [id], onDelete: Cascade)
-  product   products   @relation(fields: [product_id], references: [id], onDelete: Restrict)
+  sub_order  sub_orders       @relation(fields: [sub_order_id], references: [id], onDelete: Cascade)
+  variant    product_variants @relation(fields: [variant_id], references: [id], onDelete: Restrict)
+  products   products?        @relation(fields: [productsId], references: [id])
+  productsId String?          @db.Uuid
 
   @@index([sub_order_id])
-  @@index([product_id])
+  @@index([variant_id])
 }
 
 model shipments {
@@ -233,17 +246,4 @@ model shipments {
   sub_order sub_orders @relation(fields: [sub_order_id], references: [id], onDelete: Cascade)
 }
 
-model reviews {
-  id         String   @id @default(uuid()) @db.Uuid
-  product_id String   @db.Uuid
-  user_id    String   @db.Uuid
-  rating     Int
-  comment    String?
-  created_at DateTime @default(now())
 
-  product products @relation(fields: [product_id], references: [id], onDelete: Cascade)
-  user    users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@unique([product_id, user_id])
-  @@index([user_id])
-}

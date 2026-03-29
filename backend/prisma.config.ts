@@ -13,6 +13,8 @@ export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
+    // Prisma 6: seed command is configured inside `migrations`
+    seed: "node prisma/seed.js",
   },
   datasource: {
     url: databaseUrl,

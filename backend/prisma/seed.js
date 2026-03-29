@@ -1,25 +1,31 @@
-// prisma/seed.js — load .env before Prisma Client (seed runs in a separate Node process
-// from the Prisma CLI, so DATABASE_URL is not guaranteed unless we load it here).
-
+// backend/prisma/seed.js
+// Load .env so DATABASE_URL is available when seeding
 require("dotenv").config();
 
 const { PrismaClient } = require("@prisma/client");
-
 const prisma = new PrismaClient();
 
 async function main() {
-  const categories = [
+  // 1) Categories (upsert so you can re-run seed safely)
+  const categoriesData = [
     { name: "Electronics", slug: "electronics" },
     { name: "Clothing", slug: "clothing" },
     { name: "Home & Kitchen", slug: "home-kitchen" },
     { name: "Books", slug: "books" },
   ];
 
-  const createdCategories = await prisma.categories.createManyAndReturn({
-    data: categories,
-  });
-  console.log(`Created ${createdCategories.length} categories.`);
+  const categories = [];
+  for (const c of categoriesData) {
+    const category = await prisma.categories.upsert({
+      where: { slug: c.slug },
+      update: { name: c.name },
+      create: c,
+    });
+    categories.push(category);
+  }
+  console.log(`Ready ${categories.length} categories.`);
 
+  // 2) Products (20 items) — NOTE: schema requires price:Int and rate:Int
   const productNames = [
     "Wireless Headphones",
     "Smart Watch",
@@ -67,12 +73,12 @@ async function main() {
   ];
 
   const imagesPerProduct = 3;
-  const createdProducts = [];
+  const products = [];
   const imagePromises = [];
 
   for (let i = 0; i < 20; i++) {
-    const catIndex = i % 4;
-    const category = createdCategories[catIndex];
+    const catIndex = i % categories.length;
+    const category = categories[catIndex];
 
     const product = await prisma.products.create({
       data: {
@@ -80,15 +86,56 @@ async function main() {
         title: productNames[i],
         description: descriptions[i],
         status: "active",
+        // REQUIRED by schema.prisma (Int fields):INSERT INTO products (
+            id,
+            category_id,
+            title,
+            description,
+            status,
+            created_at,
+            updated_at,
+            price,
+            rate
+          )
+        VALUES (
+            'id:uuidINSERT INTO reviews (
+                id,
+                product_id,
+                user_id,
+                rating,
+                comment,
+                created_at
+              )
+            VALUES (
+                'id:uuid',
+                'product_id:uuid',
+                'user_id:uuid',
+                rating:integer,
+                'comment:text',
+                'created_at:timestamp without time zone'
+              );',
+            'category_id:uuid',
+            'title:text',
+            'description:text',
+            'status:USER-DEFINED',
+            'created_at:timestamp without time zone',
+            'updated_at:timestamp without time zone',
+            price:integer,
+            rate:integer
+          );
+        price: 999 + i * 137,
+        rate: 3 + (i % 3),
       },
     });
-    createdProducts.push(product);
+
+    products.push(product);
 
     for (let imgIdx = 1; imgIdx <= imagesPerProduct; imgIdx++) {
       let url = `https://picsum.photos/seed/${product.id}-${imgIdx}/400/400`;
       if (imgIdx === 3) {
         url = "/placeholder.jpg";
       }
+
       imagePromises.push(
         prisma.product_images.create({
           data: {
@@ -101,17 +148,16 @@ async function main() {
       );
     }
   }
-  console.log(`Created ${createdProducts.length} products.`);
 
+  console.log(`Created ${products.length} products.`);
   const createdImages = await Promise.all(imagePromises);
   console.log(`Created ${createdImages.length} product images.`);
-
-  console.log("Fake data inserted successfully!");
+  console.log("Seed data inserted successfully.");
 }
 
 main()
-  .catch((e) => {
-    console.error(e);
+  .catch((err) => {
+    console.error(err);
     process.exit(1);
   })
   .finally(async () => {

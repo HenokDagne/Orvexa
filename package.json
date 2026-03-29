@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "pg-promise": "^12.6.2",
+    "twilio": "^5.13.0"
+  }
+}

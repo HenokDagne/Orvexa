@@ -8,6 +8,7 @@ const {
   updateProductPatch,
   getTopRatedProducts,
   deleteProduct,
+  filterProduct,
 } = require("../controllers/productControllers");
 
 const router = Router();
@@ -20,5 +21,6 @@ router.post("/", createProduct);
 router.put("/:id", updateProductPut);
 router.patch("/:id", updateProductPatch);
 router.delete("/:id", deleteProduct);
+router.get("/filter", filterProduct);
 
 module.exports = router;
