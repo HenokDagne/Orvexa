@@ -1,0 +1,247 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+  active
+  suspended
+}
+
+enum Role {
+  admin
+  user
+}
+
+enum ProductStatus {
+  draft
+  active
+  archived
+  banned
+}
+
+enum OrderStatus {
+  created
+  confirmed
+  partially_shipped
+  shipped
+  completed
+  cancelled
+}
+
+enum SubOrderStatus {
+  new
+  processing
+  shipped
+  delivered
+  cancelled
+}
+
+enum ShipmentStatus {
+  label_created
+  in_transit
+  delivered
+}
+
+
+model users {
+  id             String     @id @default(uuid()) @db.Uuid
+  email          String     @unique
+  password_hash  String
+  name           String?
+  phone          String?
+  status         UserStatus @default(active)
+  is_email_verified Boolean @default(false)
+  is_phone_verified Boolean @default(false)
+  phone_verification_code String?
+  phone_verification_expires DateTime?
+  created_at     DateTime   @default(now())
+  updated_at     DateTime   @updatedAt
+  user_roles       user_roles[]
+  carts            carts[]
+  buyer_orders     orders[]     @relation("buyer_orders")
+  seller_suborders sub_orders[] @relation("seller_suborders")
+  reviews          reviews[]
+  username String?  @unique
+
+  
+}
+
+model user_roles {
+  user_id String @db.Uuid
+  role    Role
+
+  user users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@id([user_id, role])
+}
+
+model categories {
+  id         String   @id @default(uuid()) @db.Uuid
+  name       String
+  slug       String   @unique
+  parent_id  String?  @db.Uuid
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  parent   categories?  @relation("category_hierarchy", fields: [parent_id], references: [id], onDelete: SetNull)
+  children categories[] @relation("category_hierarchy")
+  products products[]
+}
+
+model products {
+  id          String        @id @default(uuid()) @db.Uuid
+  category_id String        @db.Uuid
+  title       String
+  description String?
+  status      ProductStatus @default(draft)
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @updatedAt
+
+  category    categories         @relation(fields: [category_id], references: [id], onDelete: Restrict)
+  images      product_images[]
+  cart_items  cart_items[]
+  reviews     reviews[]
+  order_items sub_order_items[]
+
+  @@index([category_id])
+}
+
+model product_images {
+  id         String  @id @default(uuid()) @db.Uuid
+  product_id String  @db.Uuid
+  url        String
+  alt        String?
+  sort_order Int     @default(0)
+
+  product products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@index([product_id])
+}
+
+model carts {
+  id         String   @id @default(uuid()) @db.Uuid
+  user_id    String   @unique @db.Uuid
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user  users        @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  items cart_items[]
+}
+
+model cart_items {
+  id         String @id @default(uuid()) @db.Uuid
+  cart_id    String @db.Uuid
+  product_id String @db.Uuid
+  qty        Int
+
+  cart    carts    @relation(fields: [cart_id], references: [id], onDelete: Cascade)
+  product products @relation(fields: [product_id], references: [id], onDelete: Restrict)
+
+  @@unique([cart_id, product_id])
+  @@index([product_id])
+}
+
+model orders {
+  id                   String      @id @default(uuid()) @db.Uuid
+  buyer_id             String      @db.Uuid
+  order_number         String      @unique
+  status               OrderStatus @default(created)
+  items_subtotal_cents Int
+  shipping_cents       Int
+  tax_cents            Int
+  discount_cents       Int
+  grand_total_cents    Int
+  ship_name            String
+  ship_phone           String
+  ship_line1           String
+  ship_line2           String?
+  ship_city            String
+  ship_region          String
+  ship_postal          String
+  ship_country         String
+  placed_at            DateTime?
+  created_at           DateTime    @default(now())
+  updated_at           DateTime    @updatedAt
+
+  buyer      users        @relation("buyer_orders", fields: [buyer_id], references: [id], onDelete: Restrict)
+  sub_orders sub_orders[]
+
+  @@index([buyer_id])
+}
+
+model sub_orders {
+  id             String         @id @default(uuid()) @db.Uuid
+  order_id       String         @db.Uuid
+  seller_id      String         @db.Uuid
+  status         SubOrderStatus @default(new)
+  subtotal_cents Int
+  shipping_cents Int
+  tax_cents      Int
+  discount_cents Int
+  total_cents    Int
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @updatedAt
+
+  order    orders            @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  seller   users             @relation("seller_suborders", fields: [seller_id], references: [id], onDelete: Restrict)
+  items    sub_order_items[]
+  shipment shipments?
+
+  @@index([seller_id, status])
+  @@index([order_id])
+}
+
+model sub_order_items {
+  id                  String  @id @default(uuid()) @db.Uuid
+  sub_order_id        String  @db.Uuid
+  product_id          String  @db.Uuid
+  qty                 Int
+  unit_price_cents    Int
+  product_title       String
+  product_description String?
+  image_url           String?
+  variant_sku         String
+  variant_color       String?
+  variant_size        String?
+
+  sub_order sub_orders @relation(fields: [sub_order_id], references: [id], onDelete: Cascade)
+  product   products   @relation(fields: [product_id], references: [id], onDelete: Restrict)
+
+  @@index([sub_order_id])
+  @@index([product_id])
+}
+
+model shipments {
+  id              String         @id @default(uuid()) @db.Uuid
+  sub_order_id    String         @unique @db.Uuid
+  carrier         String?
+  tracking_number String?
+  status          ShipmentStatus @default(label_created)
+  shipped_at      DateTime?
+  delivered_at    DateTime?
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @updatedAt
+
+  sub_order sub_orders @relation(fields: [sub_order_id], references: [id], onDelete: Cascade)
+}
+
+model reviews {
+  id         String   @id @default(uuid()) @db.Uuid
+  product_id String   @db.Uuid
+  user_id    String   @db.Uuid
+  rating     Int
+  comment    String?
+  created_at DateTime @default(now())
+
+  product products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  user    users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([product_id, user_id])
+  @@index([user_id])
+}
