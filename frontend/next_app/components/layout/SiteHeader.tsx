@@ -41,11 +41,8 @@ export function SiteHeader() {
           <Link href="/cart" className="hover:text-black">
             Checkout
           </Link>
-          <Link href="/orders" className="hover:text-black">
+          <Link href="/order" className="hover:text-black">
             Orders
-          </Link>
-          <Link href="/account/profile" className="hover:text-black">
-            Profile
           </Link>
         </nav>
 
@@ -58,7 +55,7 @@ export function SiteHeader() {
               </svg>
             </Icon>
           </Link>
-          <Link href="/account" className="ml-1">
+          <Link href="/account/profile" className="ml-1">
             <Icon label="Account">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Z" stroke="currentColor" strokeWidth="1.5" />
