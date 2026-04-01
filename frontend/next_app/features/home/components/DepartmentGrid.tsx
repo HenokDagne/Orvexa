@@ -27,11 +27,14 @@ export function DepartmentGrid() {
             <Link
               key={d.title}
               href={d.href}
-              className="group relative overflow-hidden rounded-2xl border border-black/10 bg-black/[0.03] p-5 hover:bg-black/[0.04]"
+              className="group relative overflow-hidden rounded-2xl border border-black/10 bg-black/[0.03] hover:bg-black/[0.04]"
             >
-              <div className="h-20 w-full rounded-xl bg-white/70" />
-              <div className="mt-4 text-sm font-medium tracking-tight">{d.title}</div>
-              <div className="mt-1 text-xs text-black/55">Browse collection</div>
+              <div className="aspect-[4/3] w-full bg-gradient-to-br from-white/70 to-black/[0.02]" />
+              <div className="absolute inset-x-0 bottom-0 p-4">
+                <div className="inline-flex items-center rounded-full border border-black/10 bg-white/80 px-4 py-2 text-sm font-medium tracking-tight text-black/80 backdrop-blur">
+                  {d.title}
+                </div>
+              </div>
               <div className="pointer-events-none absolute -right-10 -top-10 h-24 w-24 rounded-full bg-white/40 transition-transform group-hover:translate-y-2" />
             </Link>
           ))}

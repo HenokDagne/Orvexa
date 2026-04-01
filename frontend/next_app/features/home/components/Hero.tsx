@@ -37,6 +37,11 @@ export function Hero() {
 
           <div className="md:col-span-7">
             <div className="relative h-[320px] overflow-hidden rounded-2xl border border-black/10 bg-black/[0.03] md:h-[420px]">
+              <div className="absolute inset-0 grid grid-cols-12">
+                <div className="col-span-4 bg-black/[0.02]" />
+                <div className="col-span-8 bg-black/[0.06]" />
+              </div>
+
               <div className="absolute inset-0 grid place-items-center">
                 <div className="text-center">
                   <div className="text-xs font-medium tracking-widest text-black/50">
@@ -48,8 +53,12 @@ export function Hero() {
                   <div className="mt-2 text-xs text-black/50">
                     Essentials that elevate everyday living
                   </div>
+                  <div className="mt-6 text-black/35" aria-hidden="true">
+                    <span className="inline-block text-lg leading-none">+</span>
+                  </div>
                 </div>
               </div>
+
               <div className="absolute left-6 top-6 h-10 w-10 rounded-full bg-white/70" />
               <div className="absolute bottom-10 right-10 h-16 w-16 rounded-full bg-white/40" />
             </div>

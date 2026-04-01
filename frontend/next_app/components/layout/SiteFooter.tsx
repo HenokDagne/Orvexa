@@ -13,7 +13,9 @@ export function SiteFooter() {
             </p>
           </div>
           <div className="text-sm">
-            <div className="font-medium text-black/80">Shop</div>
+            <div className="text-[10px] font-medium tracking-widest text-black/50">
+              SHOP
+            </div>
             <div className="mt-3 grid gap-2 text-black/60">
               <Link href="/category/apparel" className="hover:text-black">
                 Apparel
@@ -30,11 +32,29 @@ export function SiteFooter() {
             </div>
           </div>
           <div className="text-sm">
-            <div className="font-medium text-black/80">Support</div>
+            <div className="text-[10px] font-medium tracking-widest text-black/50">
+              ACCOUNT
+            </div>
             <div className="mt-3 grid gap-2 text-black/60">
               <Link href="/account" className="hover:text-black">
                 My account
               </Link>
+              <Link href="/account/orders" className="hover:text-black">
+                Orders
+              </Link>
+              <Link href="/account/profile" className="hover:text-black">
+                Profile
+              </Link>
+              <Link href="/auth" className="hover:text-black">
+                Sign in
+              </Link>
+            </div>
+          </div>
+          <div className="text-sm">
+            <div className="text-[10px] font-medium tracking-widest text-black/50">
+              PAGES
+            </div>
+            <div className="mt-3 grid gap-2 text-black/60">
               <Link href="/search" className="hover:text-black">
                 Search
               </Link>
@@ -44,15 +64,9 @@ export function SiteFooter() {
               <Link href="/wishlist" className="hover:text-black">
                 Wishlist
               </Link>
-            </div>
-          </div>
-          <div className="text-sm">
-            <div className="font-medium text-black/80">Company</div>
-            <div className="mt-3 grid gap-2 text-black/60">
-              <span className="cursor-default">About</span>
-              <span className="cursor-default">Careers</span>
-              <span className="cursor-default">Privacy</span>
-              <span className="cursor-default">Terms</span>
+              <Link href="/" className="hover:text-black">
+                Home
+              </Link>
             </div>
           </div>
         </div>

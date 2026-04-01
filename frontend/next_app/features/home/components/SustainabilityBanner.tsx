@@ -5,8 +5,9 @@ export function SustainabilityBanner() {
     <section className="bg-white">
       <Container className="py-10">
         <div className="relative overflow-hidden rounded-2xl border border-black/10 bg-black/[0.03]">
-          <div className="grid gap-6 p-8 md:grid-cols-12 md:p-12">
-            <div className="md:col-span-7">
+          <div className="absolute inset-0 bg-gradient-to-b from-black/[0.02] to-black/[0.05]" />
+          <div className="relative grid min-h-[320px] place-items-center px-8 py-14 text-center md:min-h-[380px]">
+            <div>
               <p className="text-[10px] font-medium tracking-widest text-black/50">
                 JOURNAL
               </p>
@@ -15,17 +16,13 @@ export function SustainabilityBanner() {
                 <br />
                 New Standard of Luxury
               </h3>
-              <p className="mt-3 max-w-md text-sm leading-6 text-black/60">
+              <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-black/60">
                 Materials, manufacturing, and mindful design—what we look for in
                 every curated drop.
               </p>
             </div>
-            <div className="md:col-span-5">
-              <div className="h-48 w-full rounded-xl bg-white/70 md:h-full" />
-            </div>
           </div>
-
-          <div className="pointer-events-none absolute -bottom-16 -right-16 h-64 w-64 rounded-full bg-white/35" />
+          <div className="pointer-events-none absolute -bottom-10 -right-10 h-56 w-56 rounded-full bg-white/35" />
         </div>
       </Container>
     </section>
