@@ -5,6 +5,7 @@ import getProductById from "../middleware/product/getProductById";
 import createProduct from "../middleware/product/createProduct";
 import updateProductPut from "../middleware/product/updateProductPut"
 import updateProductPatch from "../middleware/product/updateProductPatch"
+import deleteProduct from '../middleware/product/deleteProduct'
 
 function notImplemented(name) {
 	return (req, res) => {
@@ -23,8 +24,8 @@ const getProductById = getProductById;
 const createProduct = createProduct;
 const updateProductPut = updateProductPut;
 const updateProductPatch = updateProductPatch;
-const deleteProduct = notImplemented("deleteProduct");
-const filterProduct = notImplemented("filterProduct")
+const deleteProduct = deleteProduct;
+const filterProduct = notImplemented("filterProduct") 
 
 
 module.exports = {

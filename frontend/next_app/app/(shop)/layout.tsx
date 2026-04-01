@@ -1,0 +1,1 @@
+// placeholder: Shop group layout

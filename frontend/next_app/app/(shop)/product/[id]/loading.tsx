@@ -1,0 +1,1 @@
+// placeholder: Product loading
