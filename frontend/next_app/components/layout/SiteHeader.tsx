@@ -41,8 +41,11 @@ export function SiteHeader() {
           <Link href="/cart" className="hover:text-black">
             Checkout
           </Link>
-          <Link href="/account/orders" className="hover:text-black">
+          <Link href="/orders" className="hover:text-black">
             Orders
+          </Link>
+          <Link href="/account/profile" className="hover:text-black">
+            Profile
           </Link>
         </nav>
 
