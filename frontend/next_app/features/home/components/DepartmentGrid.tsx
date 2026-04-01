@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Container } from "@/components/layout/Container";
+import { Container } from "../../../components/layout/Container";
 
 const departments = [
   { title: "Apparel", href: "/category/apparel" },

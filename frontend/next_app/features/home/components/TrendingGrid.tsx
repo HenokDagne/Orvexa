@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Container } from "@/components/layout/Container";
+import { Container } from "../../../components/layout/Container";
 
 const trending = [
   { id: "p-001", name: "Aromatic Hand Wash", price: "$19.99" },
