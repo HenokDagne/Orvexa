@@ -1,1 +1,9 @@
-// placeholder: Account layout
+import type { ReactNode } from "react";
+
+export default function AccountLayout({ children }: { children: ReactNode }) {
+	return (
+		<div className="mx-auto w-full max-w-6xl px-6 py-10">
+			{children}
+		</div>
+	);
+}
